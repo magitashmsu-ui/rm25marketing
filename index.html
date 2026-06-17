@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Опрос: Эффективность каналов коммуникации университета</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      background: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+    #header {
+      background: white;
+      border-bottom: 1px solid #E5E7EB;
+      padding: 12px 16px;
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    #header-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    #header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #section-label { font-size: 13px; color: #6B7280; font-weight: 500; }
+    #progress-count { font-size: 13px; color: #6B7280; }
+    #progress-bar-bg {
+      height: 6px;
+      background: #E5E7EB;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    #content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 16px 140px;
+    }
+
+    #section-title-area { margin-bottom: 20px; }
+    #section-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 99px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    #intro-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 18px;
+      border: 1px solid #C7D2FE;
+    }
+    #intro-card h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 17px;
+      color: #111827;
+      line-height: 1.4;
+    }
+    #intro-card p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: #6B7280;
+      line-height: 1.6;
+    }
+
+    .question-card {
+      background: white;
+      border-radius: 16px;
+      padding: 18px 16px;
+      margin-bottom: 12px;
+      border: 1.5px solid #E5E7EB;
+      transition: border-color 0.2s;
+    }
+    .question-card.answered { border-color: #C7D2FE; }
+
+    .question-text {
+      margin: 0 0 16px;
+      font-weight: 600;
+      font-size: 15px;
+      color: #111827;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .question-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .options-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #E5E7EB;
+      background: white;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 15px;
+      color: #374151;
+      min-height: 52px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .option-label.selected { border-color: var(--accent); background: var(--bg); }
+
+    .radio-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #D1D5DB;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .option-label.selected .radio-dot { border-color: var(--accent); background: var(--accent); }
+    .radio-inner {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: white;
+      display: none;
+    }
+    .option-label.selected .radio-inner { display: block; }
+
+    .checkbox-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #D1D5DB;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      font-size: 13px;
+      color: white;
+      font-weight: 700;
+    }
+    .option-label.selected .checkbox-box { border-color: var(--accent); background: var(--accent); }
+
+    .multi-hint {
+      margin: 0 0 12px;
+      font-size: 12px;
+      color: #9CA3AF;
+    }
+
+    .scale-row { display: flex; gap: 6px; margin-bottom: 8px; }
+    .scale-btn {
+      flex: 1;
+      height: 52px;
+      border-radius: 12px;
+      border: 1.5px solid #E5E7EB;
+      background: white;
+      color: #374151;
+      font-weight: 700;
+      font-size: 17px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .scale-btn.selected { border-color: var(--accent); background: var(--accent); color: white; }
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #9CA3AF;
+      line-height: 1.3;
+    }
+    .scale-labels span { max-width: 45%; }
+    .scale-labels span:last-child { text-align: right; }
+
+    #nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    #btn-back {
+      flex: 1;
+      padding: 17px 12px;
+      border-radius: 14px;
+      border: 1.5px solid #E5E7EB;
+      background: white;
+      color: #374151;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      min-height: 56px;
+      display: none;
+    }
+    #btn-next {
+      flex: 2;
+      padding: 17px 12px;
+      border-radius: 14px;
+      border: none;
+      background: #E5E7EB;
+      color: #9CA3AF;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: not-allowed;
+      transition: all 0.2s;
+      min-height: 56px;
+    }
+    #btn-next.ready { background: var(--accent); color: white; cursor: pointer; }
+
+    #incomplete-msg {
+      text-align: center;
+      font-size: 13px;
+      color: #9CA3AF;
+      margin-top: 10px;
+    }
+
+    #safe-bottom { height: env(safe-area-inset-bottom, 0px); }
+
+    /* Success screen */
+    #success-wrap {
+      display: none;
+      min-height: 100vh;
+      background: #F8FAFC;
+      flex-direction: column;
+    }
+    #success-screen {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    #success-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 24px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    #success-icon {
+      width: 72px;
+      height: 72px;
+      background: #ECFDF5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 32px;
+    }
+    #success-card h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin: 0 0 12px;
+    }
+    #success-card p {
+      color: #6B7280;
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 0 0 24px;
+    }
+    #success-count {
+      background: #F0FDF4;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      color: #16A34A;
+    }
+    /* Title screen */
+    #title-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #F8FAFC;
+    }
+    #title-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    #title-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 28px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid #C7D2FE;
+    }
+    #title-icon {
+      width: 72px;
+      height: 72px;
+      background: #EEF2FF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 32px;
+    }
+    #title-card h1 {
+      font-size: 21px;
+      font-weight: 700;
+      color: #111827;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+    #title-card p {
+      color: #6B7280;
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0 0 10px;
+    }
+    #title-card .title-meta {
+      font-size: 13px;
+      color: #9CA3AF;
+      margin: 18px 0 0;
+    }
+    #btn-start {
+      margin-top: 26px;
+      width: 100%;
+      padding: 17px 12px;
+      border-radius: 14px;
+      border: none;
+      background: #4F46E5;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      min-height: 56px;
+    }
+
+    /* Footer (shown on every screen) */
+    .page-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #9CA3AF;
+      padding: 16px 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+  </style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen">
+  <div id="title-content">
+    <div id="title-card">
+      <div id="title-icon">📋</div>
+      <h1>Магистранты РМ-25 просят Вас принять участие в опросе</h1>
+      <p>Опрос посвящён эффективности каналов внутренней коммуникации университета и займёт всего 3–5 минут. Все ответы анонимны и будут использованы только в исследовательских целях.</p>
+      <p class="title-meta">Ваше мнение очень важно для нас — спасибо, что уделите немного времени!</p>
+      <button id="btn-start" onclick="startSurvey()">Начать опрос →</button>
+    </div>
+  </div>
+  <div class="page-footer">Сделано общими усилиями группы РМ-25 · Ташкент 2026 г.</div>
+</div>
+
+<!-- SURVEY SCREEN -->
+<div id="survey-screen" style="display:none;">
+  <div id="header">
+    <div id="header-inner">
+      <div id="header-row">
+        <span id="section-label">Раздел 1 из 6</span>
+        <span id="progress-count">0 / 21</span>
+      </div>
+      <div id="progress-bar-bg">
+        <div id="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="section-title-area">
+      <div id="section-badge"></div>
+      <div id="intro-card">
+        <h2>Эффективность каналов внутренней коммуникации университета</h2>
+        <p>Опрос займёт 3–5 минут. Все ответы анонимны.</p>
+      </div>
+    </div>
+    <div id="questions-container"></div>
+    <div id="nav-row">
+      <button id="btn-back" onclick="goBack()">← Назад</button>
+      <button id="btn-next" onclick="goNext()">Далее →</button>
+    </div>
+    <p id="incomplete-msg">Ответьте на все вопросы раздела, чтобы продолжить</p>
+  </div>
+  <div class="page-footer">Сделано общими усилиями группы РМ-25 · Ташкент 2026 г.</div>
+  <div id="safe-bottom"></div>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div id="success-wrap">
+  <div id="success-screen">
+    <div id="success-card">
+      <div id="success-icon">✓</div>
+      <h2>Спасибо за участие!</h2>
+      <p>Ваши ответы помогут улучшить систему внутренней коммуникации университета. Результаты будут использованы в исследовательских целях.</p>
+      <div id="success-count"></div>
+    </div>
+  </div>
+  <div class="page-footer">Сделано общими усилиями группы РМ-25 · Ташкент 2026 г.</div>
+</div>
+
+<script>
+var questions = [
+  { id: 1, section: "Общая информация", text: "Вы являетесь:", type: "single", options: ["Студентом", "Преподавателем / сотрудником"] },
+  { id: 2, section: "Общая информация", text: "Как давно вы связаны с данным университетом?", type: "single", options: ["Менее 1 года", "1–3 года", "3–5 лет", "Более 5 лет"] },
+  { id: 3, section: "Использование каналов", text: "Какой канал коммуникации вы используете чаще всего для получения новостей и объявлений?", type: "single", options: ["Официальный сайт университета", "Telegram-канал / чат", "ВКонтакте", "Email-рассылка", "Доска объявлений (физическая)", "Корпоративный портал / LMS"] },
+  { id: 4, section: "Использование каналов", text: "Как часто вы проверяете официальные каналы университета?", type: "single", options: ["Несколько раз в день", "Раз в день", "Несколько раз в неделю", "Раз в неделю или реже"] },
+  { id: 5, section: "Использование каналов", text: "Какой формат информирования чаще всего привлекает ваше внимание?", type: "single", options: ["Короткий текстовый пост", "Инфографика / изображение", "Видеоролик", "Голосовое сообщение", "Email с подробностями"] },
+  { id: 6, section: "Использование каналов", text: "Пользуетесь ли вы корпоративным порталом или LMS (Moodle, 1С:Университет и т.п.)?", type: "single", options: ["Да, регулярно", "Да, но редко", "Нет, не знаю где найти", "Нет, предпочитаю другие каналы"] },
+  { id: 7, section: "Эффективность и удобство", text: "Оцените удобство официального сайта университета как источника информации:", type: "scale", scale: [1,2,3,4,5], labels: ["Очень неудобно", "Очень удобно"] },
+  { id: 8, section: "Эффективность и удобство", text: "Оцените оперативность получения важной информации через каналы университета:", type: "scale", scale: [1,2,3,4,5], labels: ["Очень медленно", "Очень быстро"] },
+  { id: 9, section: "Эффективность и удобство", text: "Насколько понятен язык и стиль официальных сообщений университета?", type: "scale", scale: [1,2,3,4,5], labels: ["Совсем непонятно", "Всегда понятно"] },
+  { id: 10, section: "Эффективность и удобство", text: "Бывало ли, что вы пропускали важную информацию от университета?", type: "single", options: ["Да, часто", "Да, иногда", "Очень редко", "Нет, никогда"] },
+  { id: 11, section: "Эффективность и удобство", text: "Если вы пропускали важную информацию — по какой причине? (выберите основную)", type: "single", options: ["Слишком много каналов, теряюсь", "Уведомления не приходят вовремя", "Информация спрятана или неочевидна", "Не слежу за каналами регулярно", "Не пропускал(а) — не применимо"] },
+  { id: 12, section: "Эффективность и удобство", text: "Какие каналы коммуникации кажутся вам наименее эффективными?", type: "multi", options: ["Официальный сайт", "Email-рассылка", "Доска объявлений (физическая)", "SMS-уведомления", "Объявления через деканат/кафедру устно", "Все каналы эффективны"] },
+  { id: 13, section: "Содержание и качество", text: "Достаточно ли университет информирует об учебных вопросах (расписание, сессии, дедлайны)?", type: "single", options: ["Да, информации более чем достаточно", "В целом да, но иногда не хватает", "Нет, часто приходится искать самостоятельно", "Нет, информация практически недоступна"] },
+  { id: 14, section: "Содержание и качество", text: "Насколько вы удовлетворены качеством информирования об университетских мероприятиях и событиях?", type: "scale", scale: [1,2,3,4,5], labels: ["Совсем не удовлетворён(а)", "Полностью удовлетворён(а)"] },
+  { id: 15, section: "Содержание и качество", text: "Считаете ли вы, что информация от университета публикуется своевременно?", type: "single", options: ["Да, всегда вовремя", "Чаще да, чем нет", "Чаще с опозданием", "Нет, почти всегда с опозданием"] },
+  { id: 16, section: "Современность и улучшения", text: "Что, по вашему мнению, делает университетскую коммуникацию современной? (выберите все подходящие)", type: "multi", options: ["Единый мобильный чат-бот или приложение", "Push-уведомления на телефон", "Персонализированная лента новостей", "Быстрые ответы от администрации", "Интерактивные форматы (опросы, голосования)", "Ничего из перечисленного"] },
+  { id: 17, section: "Современность и улучшения", text: "Хотели бы вы получать все важные уведомления через одно единое приложение / бот?", type: "single", options: ["Да, это было бы удобно", "Нет, предпочитаю несколько каналов", "Мне всё равно"] },
+  { id: 18, section: "Современность и улучшения", text: "Что бы вы в первую очередь улучшили в системе информирования университета?", type: "single", options: ["Создать единый канал вместо множества", "Улучшить дизайн и читаемость сообщений", "Ускорить публикацию новостей", "Добавить персонализацию под мою роль", "Ничего, меня всё устраивает"] },
+  { id: 19, section: "Современность и улучшения", text: "Готовы ли вы участвовать в тестировании новых инструментов коммуникации университета?", type: "single", options: ["Да, с удовольствием", "Возможно, зависит от формата", "Нет, мне это не интересно"] },
+  { id: 20, section: "Итоговая оценка", text: "Оцените общую эффективность системы внутренней коммуникации вашего университета:", type: "scale", scale: [1,2,3,4,5], labels: ["Очень плохо", "Отлично"] },
+  { id: 21, section: "Итоговая оценка", text: "Порекомендовали бы вы другу поступать в этот университет, зная, как здесь организована коммуникация?", type: "single", options: ["Да, точно порекомендую", "Скорее да", "Скорее нет", "Нет, это один из минусов университета"] },
+];
+
+var sectionColors = {
+  "Общая информация":          { bg: "#EEF2FF", accent: "#4F46E5", light: "#C7D2FE" },
+  "Использование каналов":     { bg: "#F0FDF4", accent: "#16A34A", light: "#BBF7D0" },
+  "Эффективность и удобство":  { bg: "#FFF7ED", accent: "#EA580C", light: "#FED7AA" },
+  "Содержание и качество":     { bg: "#FDF4FF", accent: "#9333EA", light: "#E9D5FF" },
+  "Современность и улучшения": { bg: "#F0F9FF", accent: "#0284C7", light: "#BAE6FD" },
+  "Итоговая оценка":           { bg: "#FFF1F2", accent: "#E11D48", light: "#FECDD3" },
+};
+
+var sections = [];
+questions.forEach(function(q) {
+  if (sections.indexOf(q.section) === -1) sections.push(q.section);
+});
+
+var answers = {};
+var currentSection = 0;
+
+function getSectionQuestions() {
+  return questions.filter(function(q) { return q.section === sections[currentSection]; });
+}
+
+function getColors() {
+  return sectionColors[sections[currentSection]];
+}
+
+function isSectionComplete() {
+  return getSectionQuestions().every(function(q) {
+    var ans = answers[q.id];
+    if (q.type === "multi") return ans && ans.length > 0;
+    return ans !== undefined && ans !== null && ans !== "";
+  });
+}
+
+function getAnsweredCount() {
+  return Object.keys(answers).length;
+}
+
+function setAccentVars(colors) {
+  document.documentElement.style.setProperty('--accent', colors.accent);
+  document.documentElement.style.setProperty('--bg', colors.bg);
+  document.documentElement.style.setProperty('--light', colors.light);
+}
+
+function render() {
+  var colors = getColors();
+  setAccentVars(colors);
+  var sectionQs = getSectionQuestions();
+  var answered = getAnsweredCount();
+
+  // Header
+  document.getElementById('section-label').textContent = 'Раздел ' + (currentSection + 1) + ' из ' + sections.length;
+  document.getElementById('progress-count').textContent = answered + ' / ' + questions.length;
+  var pct = Math.round((answered / questions.length) * 100);
+  var bar = document.getElementById('progress-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = colors.accent;
+
+  // Section badge
+  var badge = document.getElementById('section-badge');
+  badge.textContent = sections[currentSection];
+  badge.style.background = colors.bg;
+  badge.style.color = colors.accent;
+
+  // Intro card
+  document.getElementById('intro-card').style.display = currentSection === 0 ? '' : 'none';
+  document.getElementById('intro-card').style.borderColor = colors.light;
+
+  // Questions
+  var container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  sectionQs.forEach(function(q, idx) {
+    var globalIdx = questions.indexOf(q);
+    var isAnswered = answers[q.id] !== undefined && answers[q.id] !== null &&
+      (Array.isArray(answers[q.id]) ? answers[q.id].length > 0 : true);
+
+    var card = document.createElement('div');
+    card.className = 'question-card' + (isAnswered ? ' answered' : '');
+    card.style.setProperty('--light', colors.light);
+    if (isAnswered) card.style.borderColor = colors.light;
+
+    // Question text
+    var qText = document.createElement('p');
+    qText.className = 'question-text';
+    var numSpan = document.createElement('span');
+    numSpan.className = 'question-num';
+    numSpan.style.background = colors.bg;
+    numSpan.style.color = colors.accent;
+    numSpan.textContent = globalIdx + 1;
+    qText.appendChild(numSpan);
+    qText.appendChild(document.createTextNode(q.text));
+    card.appendChild(qText);
+
+    if (q.type === 'single') {
+      var list = document.createElement('div');
+      list.className = 'options-list';
+      q.options.forEach(function(opt) {
+        var selected = answers[q.id] === opt;
+        var lbl = document.createElement('div');
+        lbl.className = 'option-label' + (selected ? ' selected' : '');
+        lbl.style.setProperty('--accent', colors.accent);
+        lbl.style.setProperty('--bg', colors.bg);
+
+        var dot = document.createElement('span');
+        dot.className = 'radio-dot';
+        var inner = document.createElement('span');
+        inner.className = 'radio-inner';
+        dot.appendChild(inner);
+        lbl.appendChild(dot);
+        lbl.appendChild(document.createTextNode(opt));
+
+        lbl.addEventListener('click', (function(qid, val) {
+          return function() {
+            answers[qid] = val;
+            render();
+          };
+        })(q.id, opt));
+
+        list.appendChild(lbl);
+      });
+      card.appendChild(list);
+    }
+
+    if (q.type === 'multi') {
+      var hint = document.createElement('p');
+      hint.className = 'multi-hint';
+      hint.textContent = 'Можно выбрать несколько вариантов';
+      card.appendChild(hint);
+
+      var list2 = document.createElement('div');
+      list2.className = 'options-list';
+      q.options.forEach(function(opt) {
+        var current = answers[q.id] || [];
+        var selected = current.indexOf(opt) !== -1;
+        var lbl = document.createElement('div');
+        lbl.className = 'option-label' + (selected ? ' selected' : '');
+        lbl.style.setProperty('--accent', colors.accent);
+        lbl.style.setProperty('--bg', colors.bg);
+
+        var box = document.createElement('span');
+        box.className = 'checkbox-box';
+        box.textContent = selected ? '✓' : '';
+        lbl.appendChild(box);
+        lbl.appendChild(document.createTextNode(opt));
+
+        lbl.addEventListener('click', (function(qid, val) {
+          return function() {
+            var cur = answers[qid] || [];
+            var idx = cur.indexOf(val);
+            if (idx !== -1) {
+              answers[qid] = cur.filter(function(v) { return v !== val; });
+            } else {
+              answers[qid] = cur.concat([val]);
+            }
+            render();
+          };
+        })(q.id, opt));
+
+        list2.appendChild(lbl);
+      });
+      card.appendChild(list2);
+    }
+
+    if (q.type === 'scale') {
+      var scaleRow = document.createElement('div');
+      scaleRow.className = 'scale-row';
+      q.scale.forEach(function(val) {
+        var selected = answers[q.id] === val;
+        var btn = document.createElement('button');
+        btn.className = 'scale-btn' + (selected ? ' selected' : '');
+        btn.style.setProperty('--accent', colors.accent);
+        btn.textContent = val;
+        btn.addEventListener('click', (function(qid, v) {
+          return function() {
+            answers[qid] = v;
+            render();
+          };
+        })(q.id, val));
+        scaleRow.appendChild(btn);
+      });
+      card.appendChild(scaleRow);
+
+      var lblRow = document.createElement('div');
+      lblRow.className = 'scale-labels';
+      var l1 = document.createElement('span');
+      l1.textContent = q.labels[0];
+      var l2 = document.createElement('span');
+      l2.textContent = q.labels[1];
+      lblRow.appendChild(l1);
+      lblRow.appendChild(l2);
+      card.appendChild(lblRow);
+    }
+
+    container.appendChild(card);
+  });
+
+  // Nav buttons
+  var btnBack = document.getElementById('btn-back');
+  var btnNext = document.getElementById('btn-next');
+  var incMsg = document.getElementById('incomplete-msg');
+
+  btnBack.style.display = currentSection > 0 ? '' : 'none';
+
+  var complete = isSectionComplete();
+  var isLast = currentSection === sections.length - 1;
+
+  btnNext.className = 'btn-next' + (complete ? ' ready' : '');
+  btnNext.id = 'btn-next';
+  btnNext.style.background = complete ? colors.accent : '#E5E7EB';
+  btnNext.style.color = complete ? 'white' : '#9CA3AF';
+  btnNext.style.cursor = complete ? 'pointer' : 'not-allowed';
+  btnNext.textContent = isLast ? 'Отправить ✓' : 'Далее →';
+
+  incMsg.style.display = complete ? 'none' : '';
+}
+
+function startSurvey() {
+  document.getElementById('title-screen').style.display = 'none';
+  document.getElementById('survey-screen').style.display = '';
+  window.scrollTo({ top: 0 });
+}
+
+function goNext() {
+  if (!isSectionComplete()) return;
+  if (currentSection < sections.length - 1) {
+    currentSection++;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    render();
+  } else {
+    // Submit
+    document.getElementById('survey-screen').style.display = 'none';
+    var succ = document.getElementById('success-wrap');
+    succ.style.display = 'flex';
+    document.getElementById('success-count').textContent =
+      'Заполнено вопросов: ' + Object.keys(answers).length + ' из ' + questions.length;
+  }
+}
+
+function goBack() {
+  if (currentSection > 0) {
+    currentSection--;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>
